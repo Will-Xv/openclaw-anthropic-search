@@ -61,14 +61,16 @@ function resolveAgentClaudeModel(config) {
 	return typeof primary === "string" && primary.startsWith("anthropic/") ? primary.slice("anthropic/".length) : void 0;
 }
 
-function createClaudeWebSearchProvider() {
+// modelAuth is OpenClaw's public provider-auth runtime; it is only called when a search runs.
+function createClaudeWebSearchProvider(modelAuth) {
 	return {
 		id: PROVIDER_ID,
 		label: "Claude (Anthropic web search)",
-		hint: "Requires an Anthropic API key · Claude runs the searches and returns a cited answer",
+		hint: "Uses your Anthropic API key · Claude runs the searches and returns a cited answer",
 		onboardingScopes: ["text-inference"],
 		credentialLabel: "Anthropic API key",
 		envVars: ["ANTHROPIC_API_KEY"],
+		authProviderId: "anthropic",
 		placeholder: "sk-ant-...",
 		signupUrl: "https://platform.claude.com/settings/keys",
 		docsUrl: DOCS_URL,
@@ -88,7 +90,7 @@ function createClaudeWebSearchProvider() {
 				execute: async (args, context) => {
 					context?.signal?.throwIfAborted();
 					const { executeClaudeSearch } = await loadRuntime();
-					return await executeClaudeSearch(args, searchConfig, context, agentModel);
+					return await executeClaudeSearch(args, searchConfig, context, agentModel, { modelAuth, config: ctx.config });
 				}
 			};
 		}

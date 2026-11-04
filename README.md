@@ -16,18 +16,34 @@ the Gemini and Perplexity providers.
 ## Install
 
 ```bash
-npm pack --pack-destination /tmp
-openclaw plugins install npm-pack:/tmp/openclaw-anthropic-search-<version>.tgz --force --accept-capabilities
+openclaw plugins install clawhub:@will-xv/anthropic-search --accept-capabilities
 openclaw config set tools.web.search.provider claude
 ```
 
-`--force` confirms the local-archive source, and `--accept-capabilities` accepts
-the plugin's declared capability (the `claude` web search provider). A running
-Gateway picks the plugin up without a restart.
+The ClawHub package is `@will-xv/anthropic-search`. To install a local build
+instead, run `npm pack` and install `npm-pack:path/to/will-xv-anthropic-search-<version>.tgz`
+with `--force`. `--accept-capabilities` accepts the plugin's declared capability
+(the `claude` web search provider). A running Gateway picks the plugin up
+without a restart.
 
-The key comes from `plugins.entries.anthropic-search.config.webSearch.apiKey`,
-or else the `ANTHROPIC_API_KEY` environment variable. OAuth tokens from a
-Claude subscription are not supported.
+## API key
+
+If you already set up Anthropic in OpenClaw with an API key, the provider reuses
+it: an API-key auth profile or the `ANTHROPIC_API_KEY` environment variable,
+resolved through OpenClaw's public `api.runtime.modelAuth`. To use a different
+key for search, set `plugins.entries.anthropic-search.config.webSearch.apiKey`;
+it takes precedence. OAuth and setup tokens from a Claude subscription are not
+used.
+
+## Compatibility
+
+Besides the public plugin API and `api.runtime.modelAuth`, the plugin imports
+helpers from `openclaw/plugin-sdk/provider-web-search` and
+`openclaw/plugin-sdk/provider-web-search-contract` (credential contract fields,
+scoped search config, the configured-secret reader and the search cache).
+OpenClaw lists both subpaths as private-local: JavaScript-only exports for
+official plugins, with no compatibility promise. A later OpenClaw release may
+need a plugin update.
 
 ## Settings (`plugins.entries.anthropic-search.config.webSearch`)
 

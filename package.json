@@ -1,10 +1,21 @@
 {
-  "name": "openclaw-anthropic-search",
-  "version": "0.1.5",
-  "private": true,
+  "name": "@will-xv/anthropic-search",
+  "version": "0.2.0",
   "description": "OpenClaw web search provider backed by Claude's server-side web_search tool.",
   "type": "module",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Will-Xv/openclaw-anthropic-search.git"
+  },
+  "homepage": "https://github.com/Will-Xv/openclaw-anthropic-search#readme",
+  "keywords": [
+    "openclaw",
+    "openclaw-plugin",
+    "web-search",
+    "anthropic",
+    "claude"
+  ],
   "dependencies": {
     "@anthropic-ai/sdk": "0.131.0"
   },

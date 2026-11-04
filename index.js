@@ -6,6 +6,6 @@ export default definePluginEntry({
 	name: "Anthropic Search",
 	description: "Web search through Claude's server-side web_search tool",
 	register(api) {
-		api.registerWebSearchProvider(createClaudeWebSearchProvider());
+		api.registerWebSearchProvider(createClaudeWebSearchProvider(api.runtime?.modelAuth));
 	}
 });

@@ -42,8 +42,18 @@ function resolveClaudeConfig(searchConfig) {
 	return claude && typeof claude === "object" ? claude : {};
 }
 
-function resolveApiKey(claude) {
-	return readConfiguredSecretString(claude.apiKey, CREDENTIAL_PATH) ?? readProviderEnvValue(["ANTHROPIC_API_KEY"]);
+// An explicit plugin key wins. Otherwise reuse the key the Anthropic model provider already has
+// (an API-key auth profile or ANTHROPIC_API_KEY); subscription and OAuth tokens are not used here.
+async function resolveApiKey(claude, providerAuth) {
+	const configured = readConfiguredSecretString(claude.apiKey, CREDENTIAL_PATH);
+	if (configured) return configured;
+	const resolveProviderKey = providerAuth?.modelAuth?.resolveApiKeyForProvider;
+	if (resolveProviderKey) {
+		const resolved = await resolveProviderKey({ provider: "anthropic", cfg: providerAuth.config }).catch(() => void 0);
+		const apiKey = typeof resolved?.apiKey === "string" ? resolved.apiKey.trim() : "";
+		if (apiKey && resolved.mode === "api-key") return apiKey;
+	}
+	return readProviderEnvValue(["ANTHROPIC_API_KEY"]);
 }
 
 function resolveMaxUses(claude) {
@@ -117,7 +127,7 @@ function collectSearchErrors(content) {
 }
 
 function describeApiError(error) {
-	if (error instanceof Anthropic.AuthenticationError) return "Anthropic rejected the API key (401). Check ANTHROPIC_API_KEY or plugins.entries.anthropic-search.config.webSearch.apiKey.";
+	if (error instanceof Anthropic.AuthenticationError) return "Anthropic rejected the API key (401). Check the Anthropic auth profile, ANTHROPIC_API_KEY, or plugins.entries.anthropic-search.config.webSearch.apiKey.";
 	if (error instanceof Anthropic.PermissionDeniedError) return "Anthropic denied the request (403). Web search may be disabled for this organization in the Claude Console.";
 	if (error instanceof Anthropic.RateLimitError) return "Anthropic rate limit hit (429). Try again shortly.";
 	if (error instanceof Anthropic.BadRequestError) return `Anthropic rejected the search request (400): ${error.message}`;
@@ -154,13 +164,14 @@ async function runClaudeSearch(params) {
 	return { content, usage, stopReason };
 }
 
-async function executeClaudeSearch(args, searchConfig, context, agentModel) {
+async function executeClaudeSearch(args, searchConfig, context, agentModel, providerAuth) {
 	context?.signal?.throwIfAborted();
 	const claude = resolveClaudeConfig(searchConfig);
-	const apiKey = resolveApiKey(claude);
+	const apiKey = await resolveApiKey(claude, providerAuth);
+	context?.signal?.throwIfAborted();
 	if (!apiKey) return {
 		error: "missing_anthropic_api_key",
-		message: `web_search (${PROVIDER_ID}) needs an Anthropic API key. Set ANTHROPIC_API_KEY in the Gateway environment or configure ${CREDENTIAL_PATH}.`,
+		message: `web_search (${PROVIDER_ID}) needs an Anthropic API key. Set up Anthropic with an API key (an auth profile or ANTHROPIC_API_KEY in the Gateway environment) or configure ${CREDENTIAL_PATH}.`,
 		docs: DOCS_URL
 	};
 	const unsupported = UNSUPPORTED_PARAMS.find((name) => args?.[name] !== void 0);

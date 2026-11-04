@@ -9,7 +9,7 @@
   "uiHints": {
     "webSearch.apiKey": {
       "label": "Anthropic API Key",
-      "help": "Claude API key used for web search (fallback: ANTHROPIC_API_KEY env var).",
+      "help": "Optional. Leave empty to reuse the Anthropic provider's API key (an auth profile or ANTHROPIC_API_KEY).",
       "sensitive": true,
       "placeholder": "sk-ant-..."
     },
