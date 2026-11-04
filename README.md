@@ -17,9 +17,13 @@ the Gemini and Perplexity providers.
 
 ```bash
 npm pack --pack-destination /tmp
-openclaw plugins install npm-pack:/tmp/openclaw-anthropic-search-0.1.0.tgz
+openclaw plugins install npm-pack:/tmp/openclaw-anthropic-search-<version>.tgz --force --accept-capabilities
 openclaw config set tools.web.search.provider claude
 ```
+
+`--force` confirms the local-archive source, and `--accept-capabilities` accepts
+the plugin's declared capability (the `claude` web search provider). A running
+Gateway picks the plugin up without a restart.
 
 The key comes from `plugins.entries.anthropic-search.config.webSearch.apiKey`,
 or else the `ANTHROPIC_API_KEY` environment variable. OAuth tokens from a
