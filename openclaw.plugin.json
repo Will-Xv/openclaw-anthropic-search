@@ -1,0 +1,67 @@
+{
+  "id": "anthropic-search",
+  "name": "Anthropic Search",
+  "description": "Web search through Claude's server-side web_search tool",
+  "categories": ["web"],
+  "activation": {
+    "onStartup": false
+  },
+  "uiHints": {
+    "webSearch.apiKey": {
+      "label": "Anthropic API Key",
+      "help": "Claude API key used for web search (fallback: ANTHROPIC_API_KEY env var).",
+      "sensitive": true,
+      "placeholder": "sk-ant-..."
+    },
+    "webSearch.model": {
+      "label": "Search Model",
+      "help": "Claude model that runs the search and writes the cited answer (default: the agent's main model when it is an anthropic/ model, else claude-opus-5-5)."
+    },
+    "webSearch.maxUses": {
+      "label": "Max Searches",
+      "help": "Most searches Claude may run for one web_search call (default: 5). Each search is billed separately."
+    },
+    "webSearch.effort": {
+      "label": "Effort",
+      "help": "Optional output_config.effort for the search call: low, medium, high, xhigh, or max."
+    }
+  },
+  "contracts": {
+    "webSearchProviders": ["claude"]
+  },
+  "configGroups": [
+    {
+      "id": "web-search",
+      "title": "Web search",
+      "order": 10,
+      "properties": ["webSearch"]
+    }
+  ],
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "webSearch": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "apiKey": {
+            "type": ["string", "object"]
+          },
+          "model": {
+            "type": "string"
+          },
+          "maxUses": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 20
+          },
+          "effort": {
+            "type": "string",
+            "enum": ["low", "medium", "high", "xhigh", "max"]
+          }
+        }
+      }
+    }
+  }
+}

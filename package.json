@@ -1,0 +1,36 @@
+{
+  "name": "openclaw-anthropic-search",
+  "version": "0.1.5",
+  "private": true,
+  "description": "OpenClaw web search provider backed by Claude's server-side web_search tool.",
+  "type": "module",
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/sdk": "0.131.0"
+  },
+  "peerDependencies": {
+    "openclaw": ">=2026.10.10"
+  },
+  "peerDependenciesMeta": {
+    "openclaw": {
+      "optional": true
+    }
+  },
+  "openclaw": {
+    "extensions": [
+      "./index.js"
+    ],
+    "compat": {
+      "pluginApi": ">=2026.10.10"
+    },
+    "build": {
+      "openclawVersion": "2026.10.10"
+    }
+  },
+  "files": [
+    "index.js",
+    "src/**",
+    "openclaw.plugin.json",
+    "README.md"
+  ]
+}
